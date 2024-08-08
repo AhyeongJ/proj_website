@@ -13,12 +13,12 @@ website:
         text: Home
       - href: about.qmd
         text: About
-      - href: blog.qmd
+      - href: posts/index.qmd 
         text: Posts
+        
         
 format:
   html:
     theme: journal
-    css: styles.css
     toc: true
 editor: visual

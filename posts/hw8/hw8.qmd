@@ -1,0 +1,58 @@
+---
+title: "Hypothesis"
+author: Ahyeong Jeong
+date: "2024-08-05"
+categories: [Statistics]
+---
+
+### 필요한 패키지 불러오기 
+```{python}
+import numpy as np
+from scipy.stats import t
+```
+
+
+### 문제 데이터 
+```{python}
+cars = np.array([15.078, 15.752, 15.549, 15.56, 16.098, 13.277, 15.462, 16.116, 15.214, 16.93, 14.118, 14.927,
+15.382, 16.709, 16.804])
+```
+
+
+### 필요한 모수 구하기 
+```{python}
+n = len(cars)
+sample_mean = np.mean(cars)
+sample_std = np.std(cars, ddof= 1)
+```
+
+### 2.
+null: mu >= 16.0
+alter: mu < 16.0
+
+### 3.
+```{python}
+t_value = (sample_mean - 16) / (sample_std/np.sqrt(n))
+print('t_value :', t_value)
+```
+
+### 4.
+```{python}
+p_value = (t.cdf(t_value, 14))
+print('p_value :', p_value)
+```
+
+### 6. 
+```{python}
+sample_mean - t.ppf(0.975, df =  14) * (sample_std / np.sqrt(n)), sample_mean + t.ppf(0.975, df =  14) * (sample_std / np.sqrt(n))
+```
+
+###선생님 풀이 
+```{python}
+from scipy.stats import ttest_1samp
+ttest_1samp(cars, 16, alternative = 'less')
+```
+
+표본의 평균 복합 에너지 효율은 15.53173이고, 검정통계량값은 -1.85이다. 
+t검정통계량에 대응하는 p-value값 0.04276가 유의수준인 1% 보다 크므로, 귀무가설을 기각하지 못한다.
+따라서 22년 현대 자동차 신형 모델 그룹의 평균 에너지 소비효율은 1등급을 만족한다고 판단한다. 

@@ -1,0 +1,92 @@
+---
+title: "EasyPython Practice Ch4&5"
+author: Ahyeong Jeong
+date: "2024-07-17"
+categories: [EasyPython]
+---
+
+## p.84 혼자서 해보기
+
+### Q1. 다음 표의 내용을 데이터 프레임으로 만들어 출력해보세요.
+
+```{python}
+import pandas as pd
+df = pd.DataFrame({"제품"   : ["사과", "딸기", "수박"],
+                   "가격"   : [1800, 1500, 3000],
+                   "판매량" : [24, 38, 13]})
+df                  
+```
+
+### Q2. 앞에서 만든 데이터 프레임을 이용해 과일의 가격 평균과 편매량 평균을 구해보세요.
+
+```{python}
+df[["가격", "판매량"]].mean()
+```
+
+## p.115 혼자서 해보기
+
+### Q1. mpg데이터를 불러와 복사본을 만드세요.
+
+```{python}
+mpg = pd.read_csv("C:/Users/USER/Downloads/mpg.csv")
+mpg2 = mpg.copy()
+```
+
+### Q2. 복사본 데이터를 이용해 `cty`는 `city`로, `hwy`는 `highway`로 수정하세요.
+
+```{python}
+mpg2 = mpg2.rename(columns = {'cty' : 'city',
+                      'hwy' : 'highway'})
+mpg2.info()
+```
+
+### Q3. 데이터 일부를 출력해 변수명이 바뀌었는지 확인해 보세요.
+
+```{python}
+mpg2.head()
+```
+
+## p.130
+
+### Q1. `midwest.csv`를 불러와 데이터의 특징을 파악하세요.
+
+```{python}
+midwest = pd.read_csv("C:/Users/USER/Downloads/midwest.csv")
+midwest.info()
+```
+
+### Q2. `poptotal`(전체인구) 변수를 `total`로 , `popasian`(아시아 인구) 변수를 `asian`으로 수정하세요.
+
+```{python}
+midwest = midwest.rename(columns = {'poptotal' : 'total',
+                                    'popasian' : 'asian'})
+```
+
+### Q3. `total`, `asian` 변수를 이용해 '전체 인구 대비 아시아 인구 백분율' 파생변수를 추가하고, 히스토그램을 만들어 분포를 살펴보세요.
+
+```{python}
+import seaborn as sns
+import matplotlib.pyplot as plt
+midwest['asian_ratio'] = midwest['asian'] / midwest['total'] * 100
+sns.histplot(data = midwest, x = 'asian_ratio')
+plt.show()
+```
+
+### Q4. 아시아 인구 백분율 전체 평균을 구하고, 평균을 초과하면 `'large'`, 그 외에는 `'small'`을 부여한 파생변수를 만들어보세요.
+
+```{python}
+import numpy as np
+mean_asian = midwest['asian_ratio'].mean()
+midwest['asian_scale'] = np.where(midwest['asian_ratio'] > mean_asian, 'large', 'small')
+midwest.head()
+```
+
+### Q5. `'large'`와 `'small'`에 해당하는 지역이 얼마나 많은지 빈도표와 빈도 막대 그래프를 만들어 확인해보세요.
+
+```{python}
+plt.clf()
+freq_asian_scale = midwest['asian_scale'].value_counts()
+print(freq_asian_scale)
+freq_asian_scale.plot.bar(rot = 0)
+plt.show()
+```

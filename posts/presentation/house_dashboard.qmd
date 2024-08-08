@@ -1,0 +1,68 @@
+---
+title: "House Price Map Visualization"
+author: Ahyeong Jeong
+date: "2024-08-06"
+categories: [Project]
+---
+0. 필요한 패키지 불러오기 
+```{python}
+import pandas as pd
+import folium
+import numpy as np
+```
+
+
+1. 지도 데이터 준비하기 
+`Longtitude`, `Latitude`
+```{python}
+house = pd.read_csv("C:/Users/User/Documents/LS 빅데이터 스쿨/myportfolio/data/houseprice-with-lonlat.csv")
+geo = house[['Neighborhood', 'Longitude', 'Latitude']]
+geo.head()
+```
+
+
+2. `SalePrice` 데이터 준비하기 
+```{python}
+price = house[['Sale_Price', 'Neighborhood']]
+price.head()
+```
+
+3. 배경 지도 만들기 
+```{python}
+mean_lon = np.mean(geo['Longitude'])
+mean_lat = np.mean(geo['Latitude'])
+map_sig = folium.Map(location = [mean_lon, mean_lat], 
+                     zoom_start = 8, 
+                     tiles = 'cartodbpositron')
+```
+
+4. 단계 구분도 만들기
+```{python}
+bins = list(price['Sale_Price'].quantile([0, 0.2, 0.4, 0.6, 0.8, 1]))
+
+folium.Choropleth(
+    geo_data = geo, 
+    data = price,
+    columns = ('Neighborhood', 'Sale_Price'),
+    key_on = {geo['Neighborhood']},
+    fill_color = 'YlGnBu', 
+    fill_opacity = 1,
+    line_opacity = 0.5,
+    bins = bins) \
+     .add_to(map_sig)
+map_sig
+```
+
+
+
+```{python}
+map_sig.save('map_sig.html')
+```
+
+```{python}
+import webbrowser
+webbrowser.open_new('map_sig.html')
+```
+
+
+

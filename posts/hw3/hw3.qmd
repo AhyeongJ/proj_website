@@ -1,0 +1,86 @@
+---
+title: "EasyPython Practice Ch7"
+author: Ahyeong Jeong
+date: "2024-07-17"
+categories: [EasyPython]
+---
+
+## p. 185
+문제 준비하기
+```{python}
+import pandas as pd
+import numpy as np
+mpg = pd.read_csv("C:/Users/USER/Documents/LS 빅데이터 스쿨/lsbigdata_project1/data/mpg.csv")
+
+#NaN 할당하기
+mpg.loc[[64, 123, 130, 152, 211], 'hwy'] = np.nan
+```
+
+#### Q1.
+`drv` 별로 `hwy` 평균이 어떻게 다른지 알아보려고 한다.
+분석을 하기 전에 우선 두 변수에 결측치가 있는지 확인해야 한다. 
+`drv` 변수와 `hwy` 변수에 결측치가 몇 개 있는 지 알아보자. 
+```{python}
+mpg[['drv', 'hwy']].isna().sum()
+```
+#### Q2. 
+`df.dropna()`를 이용해 `hwy` 변수의 결측치를 제거하고, 어떤 구동 방식의 `hwy` 평균이 높은지 알아봐. 
+하나의 `pandas` 구문으로 만들어야 한다. 
+```{python}
+mpg.dropna(subset = 'hwy') \
+   .groupby('drv', as_index = False) \
+   .agg(mean = ('hwy', 'mean'))
+```
+## p.194
+문제 준비하기
+```{python}
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+mpg = pd.read_csv("C:/Users/USER/Documents/LS 빅데이터 스쿨/lsbigdata_project1/data/mpg.csv")
+
+# drv 이상치 할당
+mpg.loc[[9,13, 57, 92], 'drv'] = 'k'
+
+# cty 이상치 할당
+mpg.loc[[28, 42, 128, 202], 'cty'] = [3, 4, 39, 42]
+```
+
+#### Q1.
+`drv`에 이상치가 있는지 확인하라. 
+이상치를 결측 처리한 다음 이상치가 사라졌는지 확인하라.
+결측처리를 할 때는 df.isin()을 활용하세요. 
+```{python}
+mpg['drv'].value_counts().sort_index()
+mpg['drv'] = np.where(mpg['drv'].isin(['f', '4', 'r']), mpg['drv'], np.nan)
+mpg['drv'].value_counts().sort_index()
+```
+
+#### Q2. 
+상자 그림을 이용해 `cty`에 이상치가 있는지 확인하세요. 상자 그림 기준으로 정상 범위를 벗어난 값을 결측 처리한 다음 다시 상자 그림을 만들어 이상치가 사라졌는지 확인하라. 
+```{python}
+sns.boxplot(data = mpg, y = 'cty')
+plt.show()
+```
+```{python}
+pct25 = mpg['cty'].quantile(.25)
+pct75 = mpg['cty'].quantile(.75)
+IQR = pct75 - pct25
+print(pct25 - IQR * 1.5, pct75 + IQR * 1.5)
+mpg['cty'] = np.where((mpg['cty'] > 26.5) | (mpg['cty'] < 6.5), np.nan, mpg['cty'])
+
+plt.clf()
+sns.boxplot(data = mpg, y = 'cty')
+plt.show()
+```
+
+####Q3.
+두 변수의 이상치를 결측 처리 했으니 이제 분석할 차례다.
+이상치를 제거한 다음 `drv`별로 `cty` 평균이 어떻게 다른지 알아보자. 
+하나의 `pandas` 구문으로 만들어야 함. 
+```{python}
+mpg.dropna(subset = ['drv', 'cty']) \
+   .groupby('drv') \
+   .agg(mean = ('cty', 'mean'))
+```

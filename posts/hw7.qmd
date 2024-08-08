@@ -1,0 +1,126 @@
+---
+title: "Convinience Level Practice"
+author: Ahyeong Jeong
+date: "2024-07-30"
+categories: [Statistics]
+---
+# Convinience Level Visualization Practice
+
+__필요한 패키지 불러오기__
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy.stats import norm
+```
+
+__데이터 불러오기__
+```{python}
+# !pip install pyreadstat
+welfare = pd.read_spss("C:/Users/USER/Documents/LS 빅데이터 스쿨/myportfolio/data/Koweps_hpwc14_2019_beta2.sav")
+welfare.head()
+```
+
+
+__필요한 컬럼들 이름 바꾸기__
+```{python}
+welfare = welfare.rename(
+    columns = {'h14_g3'     : 'sex',           # 성별
+               'h14_g4'     : 'birth',         # 태어난 년도
+               'h14_g10'    : 'marriage_type', # 혼인 상태
+               'h14_g11'    : 'religion',      # 종교
+               'p1402_8aq1' : 'income',        # 월급
+               'h14_eco9'   : 'code_job',      # 직업 코드
+               'h14_reg7'   : 'code_region'})   # 지역 코드 
+welfare= welfare[['sex', 'birth', 'marriage_type', 'religion', 'income', 'code_job', 'code_region']]
+```
+
+
+__`sex` 컬럼 검토 및 `male`, `female`로 변경__
+```{python}
+# 원래 성별 변수
+welfare['sex'].dtypes
+welfare['sex'].value_counts() 
+# welfare['sex'].isna().sum()
+
+# male과 female로 변경
+welfare['sex'] = np.where(welfare['sex'] == 1, 'male', 'female')
+welfare['sex'].value_counts()
+```
+
+
+__성별에 따른 월급 알아보기__
+```{python}
+sex_income = welfare.dropna(subset = 'income') \
+                         .groupby('sex', as_index = False) \
+                         .agg(mean_income = ('income', 'mean'))
+sex_income
+```
+
+
+__성별 월급 평균표__
+```{python}
+sns.barplot(data = sex_income, x = 'sex', y = 'mean_income', hue = "sex", palette = "pastel")
+plt.show()
+plt.clf()
+```
+
+
+__신뢰구간 계산 전 필요한 모수 구하기__
+
+
+0. 성별에 따른 income 데이터프레임 생성
+```{python}
+f_income = welfare.dropna(subset = "income") \
+                  .query("sex == 'female'")['income']
+m_income = welfare.dropna(subset = 'income') \
+                  .query("sex == 'male'")['income']
+```
+
+1. 성별 별 평균 
+```{python}
+f_bar = np.mean(f_income)
+m_bar = np.mean(m_income)
+```
+
+2. 표본표준편차 사용해서 모표분편차 추정
+```{python}
+f_std = np.sqrt(np.var(f_income, ddof=1))
+m_std = np.sqrt(np.var(m_income, ddof=1))
+```
+
+3. 성별 별 표본 개수 구하기
+```{python}
+f_n = len(f_income)
+m_n = len(m_income)
+```
+
+4. z
+```{python}
+z_0025 = norm.ppf(0.95, loc=0, scale=1)
+```
+
+
+__성별 별로 신뢰구간 계산하기__
+```{python}
+f_conf1 = f_bar - z_0025 * f_std/np.sqrt(f_n)
+f_conf2 = f_bar + z_0025 * f_std/np.sqrt(f_n)
+m_conf1 = m_bar - z_0025 * m_std/np.sqrt(m_n)
+m_conf2 = m_bar + z_0025 * m_std/np.sqrt(m_n)
+```
+
+
+__그래프에 나타내기__
+```{python}
+sns.barplot(data = sex_income, x = 'sex', y = 'mean_income', hue = "sex", palette = "pastel")
+plt.vlines(x = "female", ymin = f_conf1, ymax = f_conf2, colors = "blue")
+plt.vlines(x = "male", ymin = m_conf1, ymax = m_conf2, colors = "red")
+plt.show()
+plt.clf()
+```
+
+
+
+male_mean - z_0025 * 

@@ -1,0 +1,62 @@
+---
+title: "Sample Variance"
+author: Ahyeong Jeong
+date: "2024-07-25"
+categories: [Statistics]
+---
+
+# Sample Variance
+
+## n-1 vs. n
+
+**표본 분산 계산 시 왜 n-1로 나누는가.**
+
+**문제**
+
+-   **U(3, 7)**에서 **20**개의 표본을 뽑아서 분산을 2가지 방법으로 추정하자.
+-   **n-1**로 나눈 것을 `s_2`, **n**으로 나눈 것을 `k_2`로 정의하기
+-   `s_2`의 분포와 `k_2`의 분포를 그려보자 **(10000개 사용)**
+-   각 분포 그래프에 모분산의 위치에 녹색 막대를 그리기
+-   결과를 살펴보고, 왜 **n-1**로 나눈 것을 분산을 추정하는 지표로 사용하는 것이 타당한 지 서술하기.
+
+**0. 필요한 패키지 가져오기**
+```{python}
+import numpy as np
+from scipy.stats import uniform
+import seaborn as sns 
+import matplotlib.pyplot as plt
+```
+
+**1. `s_2` 분포 그래프 그리기**
+
+```{python}
+x=uniform.rvs(loc=3, scale=4, size=20*10000)
+x=x.reshape(-1, 20)
+x.shape
+pop_var = uniform.var(loc=3, scale=4)
+```
+```{python}
+s_2 = np.var(x, axis=1, ddof=1)
+sns.histplot(s_2, stat='density', color = "lightpink")
+plt.axvline(pop_var, color="red", linestyle = '--')
+plt.xlim([0, 2.5])
+plt.show()
+plt.clf()
+```
+
+
+
+**2. `k_2` 분포 그래프 그리기**
+
+```{python}
+k_2 = np.var(x, axis=1, ddof=0)
+sns.histplot(k_2, stat='density', color = "lightblue")
+plt.axvline(pop_var, color="red", linestyle = '--')
+plt.xlim([0, 2.5])
+plt.show()
+plt.clf()
+```
+
+-   두 그래프를 봤을 때, `s_2`의 분포그래프가 모분산을 나타내는 녹색축을 중심을 두고 분포된 것을 알 수 있다.
+-   반면, `k_2`의 분포그래프가 모분산을 나타내는 녹색축을 중심으로 왼쪽으로 편향된 것이 확인된다.
+-   따라서 n-1로 나눈 `s_2`가 모분산을 더 잘 추정한다고 할 수 있다.

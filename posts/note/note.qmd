@@ -1,0 +1,222 @@
+---
+title: "LS Bigdata School note 1"
+author: Ahyeong Jeong
+date: "2024-07-17"
+categories: [note]
+---
+#### Python
+
+-   `Ctrl + Enter`
+-   `Shift + 화살표`: 블록
+-   `Shift + Alt + 아래화살표`: 아래로 복사
+-   `Ctrl + Alt + 아래화살표`: 커서 여러개
+
+```{python}
+a = 1
+a
+```
+
+-   `ls(dir)`: 파일 목록
+
+-   `cd`: 폴더 이동
+
+-   `.` 현재폴더
+
+-   `..` 상위폴더
+
+-   Show folder in new window: 해당위치 탐색기
+
+-   앞에 조금 적고 `Tab`: 자동완성
+
+-   `cls`: 화면 정리
+
+#### 변수에 값을 할당
+
+```{python}
+number = 10 
+greeting = "안녕하세요!"
+greeting = '안녕하세요!'
+greeting = "'안녕하세요'라고 말했다" # 작은따옴표, 큰따옴표가 쓰이는 이유
+```
+
+#### 리스트 만들기
+
+```{python}
+var1 = [1, 2, 3]
+print(var1)
+var2 = [4, 5, 6]
+print(var2) 
+print(var1 + var2)
+a = '안녕하세요!'
+b = 'LS 빅데이터 스쿨!'
+print(a + b)
+print(a + ' ' + b)
+# 문자는 문자끼리만 더할 수 있음. 
+```
+
+#### 변수 생성
+
+```{python}
+num1 = 3
+num2 = 5
+print(num1 + num2)
+```
+
+#### 변수명 스타일
+
+-   스네이크 케이스: 모든 글자 소문자, 단어 사이에 밑줄 사용 ex) ls_bigdata_shool
+-   카멜 케이스: 각 단어의 첫 글자를 대문자로 시작 ex) LsBigdataSchool
+
+#### 기본산술연산자
+
+```{python}
+a = 10
+b = 3.3
+print(a + b) #덧셈(정수는 실수로 변환해 계산)
+print(a - b) #뺄셈
+print(a * b) #곱셈
+print(a / b) #나눗셈
+print(a % b) #나머지
+print(a // b) #몫(정수나눗셈)
+print(a ** b) #거듭제곱 
+```
+
+#### 비교관련연산자
+
+```{python}
+a = 10
+b = 20
+
+print(a == b)
+print(a != b)
+print(a < b)
+print(a > b)
+print(a >= b)
+print(a <= b)
+```
+
+#### 연습문제 num1 num2 만들고 큰 수 구하기
+
+```{python}
+num1 = ((2**4) + (12453//7)) % 8
+num2 = ((9**7) / 12) * (36452 % 253)
+print(num1 < num2) 
+
+user_age = 22
+is_adult = user_age >= 18
+print("성인입니까?", is_adult)
+```
+
+#### True나 False 같은 예약어는 변수명으로 쓰일 수 없다
+
+```{python}
+true = [1, 2, 3]
+a = "True"
+#python은 대소문자를 구분함. 
+c = true  #위와 달리 true에 대해서 값을 할당했기 때문에 true 변수의 값을 c에 할당함. 
+d = True  #boolean으로 부여  
+```
+
+#### 논리관련연산자 (Boolean)
+
+```{python}
+a = True
+b = False
+print(a and b)
+print(a or b)
+print(not a)
+```
+
+#### and 연산자
+
+-   True: 1 , False: 0
+
+```{python}
+print(True + True) 
+print(True + False) 
+print(False + False) 
+```
+
+#### and는 곱(\*)으로 치환 가능
+
+```{python}
+print(True * True) #1
+print(True * False) #0
+print(False * False) #0
+```
+
+#### or 연산자
+
+```{python}
+print(True or True)
+print(True or False)
+print(False or True)
+print(False or False)
+```
+
+#### or은 덧셈(+)과 같음
+
+```{python}
+a = True
+b = False
+print(a or b)
+print(min(a + b , 1)) #수식, 0일 때 제외하고 모든 결과 1 
+```
+
+#### 복합대입연산자
+
+```{python}
+a = 100
+a += 10
+a -= 10
+a *= 2 
+a /= 2
+a %= 14 #나머지a
+a **= 2
+a //= 2 #몫
+a
+```
+
+#### 문자열 반복
+
+```{python}
+str1 = "Hello! "
+repeated_str1 = str1 * 3  #문자열과 숫자의 곲셈은 정수만 가능 
+print("Repeated string:", repeated_str1)
+
+print(str1 * (-2)) #error 안 뜲 '' 
+print(str1 * 0)  #error 안 뜲 '' 
+```
+
+-   정수: integer
+-   실수: float (double)
+
+#### 단항 연산자
+
+```{python}
+x = 5
+print(+x) #양수 강조
+print(-x) #부호 변환
+print(~x) #x의 비트를 반전 
+```
+
+#### 비트 연산자
+
+-   bin()함수를 사용하면 정수의 이진수 표현을 반환함
+-   bin()은 이진수 표현을 문자열 형식으로 제공함. 모든 이진수 문자열은 0b 접두사로 시작
+
+#### 패키지 설치하기
+
+1.  Terminal에서 설치하기
+2.  느낌표(!) 뒤에 설치 코드 입력하기
+
+-   설치코드: `pip install 패키지명`
+
+```{python}
+import pydataset
+pydataset.data() #데이터셋 목록 출력 (757개의 데이터셋)
+df = pydataset.data("AirPassengers") # 특정 데이터 불러오기 
+df.head()
+
+import pandas as pd
+```

@@ -1,0 +1,128 @@
+---
+title: "EasyPython Practice Ch8"
+author: Ahyeong Jeong
+date: "2024-07-29"
+categories: [EasyPython]
+---
+# Ch 8. 그래프 만들기 
+
+#### Line Plot
+필요한 패키지 불러오기.
+```{python}
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
+```
+
+
+데이터 불러오기.
+```{python}
+economics = pd.read_csv("C:/Users/USER/Documents/LS 빅데이터 스쿨/myportfolio/data/economics.csv")
+economics.head()
+economics.info()
+```
+
+
+시계열 그래프 만들기.
+```{python}
+sns.lineplot(data = economics, x ="date", y ="unemploy")
+plt.show()
+plt.clf()
+```
+
+
+문자타입의 date를 날짜 시간 타입으로 변환.
+```{python}
+economics['date2'] = pd.to_datetime(economics['date'])
+economics.info()
+```
+
+
+변수의 타입을 날짜 시간으로 바꿔도 값이 달라지지 않음.
+```{python}
+economics[['date', 'date2']]
+```
+
+
+변수가 날짜 시간 타입으로 되어 있으면 `df.dt`로 연, 월, 일 추출 가능
+```{python}
+economics['date2'].dt.year.head()  # 연 추출
+economics['date2'].dt.month.head() # 월 추출
+economics['date2'].dt.day.head()   # 일 추출 
+economics['date2'].dt.month_name() # 월 명 추출 
+economics['date2'].dt.quarter      # 분기 추출 
+economics['quarter'] = economics['date2'].dt.quarter
+economics[['date2', 'quarter']]
+economics['date2'].dt.day_name()   #요일 알아보기 
+```
+
+
+한달을 더할 지 30일을 더할 지 생각해보기.
+```{python}
+economics['date2'] + pd.DateOffset(months=1)
+economics['date2'] + pd.DateOffset(days=30)
+economics['date2'].dt.is_leap_year   # 윤년 체크 
+```
+
+
+연도 별 실업률 선그래프
+```{python}
+# 연도별로 표본 평균을 구해서 선그래프에 나타남.
+economics['year'] = economics['date2'].dt.year
+sns.lineplot(data = economics, x = 'year', y = 'unemploy')
+sns.scatterplot(data = economics, x = 'year', y = 'unemploy')
+plt.show()
+plt.clf()
+```
+-   표시된 면적은 신뢰구간을 나타낸다.
+-   `errorbar = None` 설정 시 신뢰구간 제외하고 그래프 그려짐.
+
+
+economics의 연도별 실업률 평균과 표준편차 구하기 
+```{python}
+df = economics.groupby('year', as_index = False) \
+              .agg(mean = ('unemploy', 'mean'),
+                   std  = ('unemploy' ,'std'),
+                   n    = ('unemploy', 'count'))
+Z = 1.96
+df['left_CI'] = df['mean'] - Z * df['std']/np.sqrt(df['n']) 
+df['right_CI'] = df['mean'] + Z * df['std']/np.sqrt(df['n'])
+df.head()
+```
+
+```{python}
+x = df["year"]
+y = df["mean"]
+plt.plot(x, y, color= 'black')
+plt.scatter(x, df['left_CI'], color = 'blue', s=2)
+plt.scatter(x, df['right_CI'], color = 'blue', s=2)
+plt.show()
+plt.clf()
+```
+
+
+
+
+#### 혼자서 해보기
+`economics' 데이터를 이용해 분석 문제를 해결해 보세요
+Q1. `psavert`(개인 저축률)가 시간에 따라 어떻게 변해 왔는지 알아보려고 한다.
+연도별 개인 저축률 변화를 나타낸 시계열 그래프를 만들어보자. 
+```{python}
+economics = pd.read_csv('C:/Users/USER/Documents/LS 빅데이터 스쿨/myportfolio/data/economics.csv')
+economics['date2'] = pd.to_datetime(economics['date'])
+economics['year'] = economics['date2'].dt.year
+sns.lineplot(data = economics, x = 'year', y = 'psavert')
+plt.show()
+plt.clf()
+```
+
+Q2. 2014년 월별 `psavert`의 변화를 나타낸 시계열 그래프를 만들어 보세요.
+```{python}
+economics['month'] = economics['date2'].dt.month
+df_2014 = economics.query("year == 2014")
+sns.lineplot(data = df_2014, x = 'month', y = 'psavert')
+plt.show()
+plt.clf()
+```
+

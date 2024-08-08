@@ -1,0 +1,191 @@
+---
+title: "ISLP Lab: Introduction to Python"
+author: Ahyeong Jeong
+date: "2024-07-25"
+categories: [ISLP]
+---
+## CH2. Introduction to Python 
+## Practice
+
+#### 8. 
+__이 문제는 `College.csv` 파일에 있는 `College`자료에 관련된다.__
+__이것은 미국 내의 777개 대학에 대한 다수의 변수들을 포함한다.__
+
+__필요한 패키지 불러오기__
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+#!pip install ISLP
+```
+
+#### 8-(a)
+
+__Call the loaded data college__
+
+```{python}
+college = pd.read_csv("C:/Users/USER/Documents/LS 빅데이터 스쿨/myportfolio/posts/ISLP/data/College.csv")
+```
+
+
+#### 8-(b)
+
+__The first column is just the name of each university in a column named something like `Unnamed: 0`__     
+__Following codes are used to give each row a name corresponding to the appropriate university__
+```{python}
+print('Column names of college data :', college.columns)
+college2 = pd.read_csv("C:/Users/USER/Documents/LS 빅데이터 스쿨/myportfolio/posts/ISLP/data/College.csv", index_col = 0)
+college3 = college.rename({'Unnamed: 0': 'College'},
+                          axis =1)
+college3 = college3.set_index('College')
+college = college3
+```
+
+
+#### 8-(c)
+__Use the `describe()` method of to produce a numerical summary of the variables__
+```{python}
+college.describe()
+```
+
+#### 8-(d)
+__Use the `pd.plotting.scatter_matrix()` function to produce a scatterplot matrix of the first columns `[Top10perc, Apps, Enroll]`.__
+__Recall that you can reference a list C of columns of a data frame A using A[C].__
+```{python}
+pd.plotting.scatter_matrix(college[['Top10perc', 'Apps', 'Enroll']])
+plt.show()
+plt.clf()
+```
+
+* `pd.plotting.scatter_matrix()` : to create a scatterplot matrix to visualize all of the pairwise relationships between the columns in a data frame
+
+#### 8 - (e)
+__Use the `boxplot()` method of `college` to produce side-by=side boxplots of `Outstate` versus `Private`__
+```{python}
+college['Outstate'].dtype
+college['Private'].value_counts()
+sns.boxplot(data = college, x = 'Private', y = 'Outstate', hue = 'Private', palette = "pink")
+plt.show()
+plt.clf()
+```
+
+
+#### 8 - (f)
+__Create a new qualitative variable, called `Elite`, by binning the `Top10perc` variable into two groups__
+__Based on the proportion of students coming from the top 10% of their high school classes exceeds 50%.__
+```{python}
+college['Elite'] = pd.cut(college['Top10perc'],
+                          [0, 50, 100],
+                          labels=['No', 'Yes'])
+```
+
+__Use the `value_counts()` method of `college['Elite']` to see how many elite universities there are__
+```{python}
+college['Elite'].value_counts()
+```
+
+__Finally, use the `boxplot()` method again to produce side-by-side boxplots of `Outstate` versus `Elite`.__
+```{python}
+sns.boxplot(data = college, x = "Elite", y = "Outstate", hue = "Elite", palette = "pink")
+plt.show()
+plt.clf()
+```
+
+#### 8 - (g)
+
+__Use the `plot.hist()` method of `college` to produce some histograms with differing numbers of bins for a few of the quantitative variables__
+__The command plt.subplots(2, 2) may be useful: it will divide the plot window into four regions so that four plots can be made simultaneously. By changing the arguments you can divide the screen up in other combinations.__
+```{python}
+college['Expend'].describe()
+fig = plt.figure()
+plt.subplot(221)
+sns.histplot(data = college, x = "Expend")
+plt.subplot(222)
+sns.histplot(data = college, x = "Personal")
+plt.subplot(223)
+sns.histplot(data = college, x = "Room.Board")
+plt.subplot(224)
+sns.histplot(data = college, x = "Books")
+plt.show()
+plt.clf()
+```
+
+
+#### 9 
+__This exercise involves the `Auto` data set studied in the lab. Make sure that the missing values have been removed from the data.__
+
+#### 9 -(a)
+__Which of the predictors are quantitative, and which are qualitatative?__
+
+```{python}
+auto = pd.read_csv("C:/Users/USER/Documents/LS 빅데이터 스쿨/myportfolio/posts/ISLP/data/Auto.csv")
+auto.info()
+```
+
+* The variables which dtype is object are `horsepower`, `name`
+
+
+__There are missing values represented by a `?`.__
+__Change to numeric.__
+```{python}
+auto['horsepower'].unique()
+auto = auto[auto.horsepower != "?"].copy()
+auto['horsepower'] = pd.to_numeric(auto['horsepower'])
+```
+
+```{python}
+quantitative = auto.select_dtypes(include =['number']).columns
+qualitative = auto.select_dtypes(exclude = ['number']).columns
+```
+
+
+#### 9 - (b)
+
+__What is the range of each quantitative predictor? You can answer this using the `min()` and `max()` methods in `numpy`.__
+
+```{python}
+auto_describe = auto.describe()
+auto_describe.loc['range'] = auto_describe.loc['max'] - auto_describe.loc['min']
+auto_describe.loc['range']
+```
+
+#### 9 - (c)
+
+__What is the mean and standard deviation of each quantitative predictor?__
+
+```{python}
+# auto.describe()
+auto_describe.loc[['range', 'mean', 'std']]
+```
+
+#### 9 - (d)
+
+__Remove the 10th through 85th observations.__
+__What is the range, mean, and standard deviation of each predictor?__
+```{python}
+auto_drop = auto.drop(auto.index[10:85])
+auto_drop_describe = auto.describe()
+auto_drop_describe.loc['range'] = auto_drop_describe.loc['max'] - auto_drop_describe.loc['min']
+auto_drop_describe.loc[["range", "mean", "std"]]
+```
+
+#### 9 - (e)
+
+__Using the full data set, investicate the predictors graphically, using scatterplots or other tools of your choice. Create some plots highlighting the relationships among the predidctors. Comment on your findings.__
+```{python}
+sns.pairplot(auto, plot_kws={'s': 5})
+plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
+plt.show()
+plt.clf()
+```
+
+#### 9 - (f)
+
+__Suppose that we wish to predict `mpg` on the basis of the other variables. Do your plots suggest that any of the other variables might be useful in predicting `mpg`?__
+
+Based on the previous question, we could use weight, horsepower and displacement. These variables have a non-linear relationship with mpg. 
+
+
+
+

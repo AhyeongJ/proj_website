@@ -1,0 +1,74 @@
+---
+title: "EasyPython Practice Ch. Plotly를 이용한 인터렉티브 그래프" 
+author: Ahyeong Jeong 
+date: "2024-07-17" 
+categories: [EasyPython]
+---
+
+## Plotly를 이용한 인터렉티브 그래프
+
+**필요한 패키지 불러오기**
+
+```{python}
+import pandas as pd
+import plotly.express as px
+```
+
+**데이터 불러오기**
+
+```{python}
+mpg = pd.read_csv('C:/Users/USER/Documents/LS 빅데이터 스쿨/myportfolio/data/mpg.csv')
+```
+
+**1. 산점도 만들기: `px.scatter`**
+
+```{python}
+px.scatter(data_frame = mpg, x = 'cty', y = 'hwy', color = 'drv')
+```
+
+**인터렉티브 기능 활용하기**
+
+-   `plotly`로 만든 그래프는 마우스 움직임에 반응한다.
+-   산점도의 표식에 마우스 커서를 올리면 값이 나타난다.
+-   마우스로 드래그 하면 x,y축의 범위가 바뀌고, 더블클릭하면 원래대로 되돌아온다.
+-   범례항목을 클릭하면 특정 범주의 표식을 켜거나 끌 수 있다.
+
+**2. 막대 그래프 만들기: `px.bar()`**
+
+```{python}
+# 자동차 종류별 빈도 구하기
+df = mpg.groupby('category', as_index = False) \
+        .agg(n = ('category', 'count'))
+df
+```
+
+```{python}
+# 막대그래프 만들기
+px.bar(data_frame = df, x = 'category', y = 'n', color = 'category')
+```
+
+**3. 선그래프 만들기: `px.line()`**
+
+```{python}
+# economics 불러오기
+economics = pd.read_csv("C:/Users/USER/Documents/LS 빅데이터 스쿨/myportfolio/data/economics.csv")
+```
+
+일자별 저축률을 선 그래프로 표현하자
+
+```{python}
+# 선 그래프 만들기
+px.line(data_frame = economics, x = 'date', y = 'psavert')
+```
+
+**4. 상자 그림 만들기: px.bar()**
+
+```{python}
+px.box(data_frame = mpg, x = 'drv', y = 'hwy', color = 'drv')
+```
+
+**plotly 활용하기** \* 그래프 크기 조절하기 `width`: 가로크기, `height`: 세로크기
+
+```{python}
+px.scatter(data_frame = mpg, x = 'hwy', y = 'cty', color = 'drv', width = 600, height = 400)
+```
